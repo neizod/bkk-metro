@@ -3,6 +3,7 @@ non_empty_line = (x) -> x.trim() != ''
 
 read_spec = (text) ->
     [id, title, dt, llspecs] = text.split('\t')
+    id = null if id == '-'
     [start, end] = dt.split(',')
     end = '2100' unless end?
     lls = (ll.split(',') for ll in llspecs.split(' '))
