@@ -22,9 +22,13 @@ load_all = (tm) ->
 load_set = (name, tm) ->
     $.get "data/#{name}.txt", (data) ->
         [header, contents] = data.trim().split('===\n')
+        [title, color] = header.trim().split('\n')
         ds = tm.createDataset name,
-            title: name
-            theme: 'red'
+            title: title
+            theme: new TimeMapTheme
+                lineColor: color
+                lineWeight: 3
+                icon: 'img/tiny-pointer.png'
             type: 'basic'
         ds.loadItems(contents.split('\n').filter(non_empty_line), read_spec)
         tm.refreshTimeline()
