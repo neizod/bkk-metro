@@ -1,16 +1,18 @@
-non_empty_line = (x) -> x.trim() != ''
+data_line = (x) -> x.trim() != ''
+get_coord = (ll, memo) -> if ll of memo then memo[ll] else ll.split(',')
 
 
-read_spec = (text) ->
+read_with_memo = (memo={}) -> (text) ->
     [id, title, dt, llspecs] = text.split('\t')
     id = null if id == '-'
     [start, end] = dt.split(',')
     end = '2100' unless end?
-    lls = (ll.split(',') for ll in llspecs.split(' '))
+    lls = (get_coord(ll, memo) for ll in llspecs.split(' '))
     polyline = [point, others...] = ({lat, lon} for [lat, lon] in lls)
     if others.length
         {id, title, start, end, polyline}
     else
+        memo[id] = [lat, lon] if id?
         {id, title, start, end, point}
 
 
@@ -30,7 +32,7 @@ load_set = (name, tm) ->
                 lineWeight: 3
                 icon: 'img/tiny-pointer.png'
             type: 'basic'
-        ds.loadItems(contents.split('\n').filter(non_empty_line), read_spec)
+        ds.loadItems(contents.split('\n').filter(data_line), read_with_memo())
         tm.refreshTimeline()
 
 
