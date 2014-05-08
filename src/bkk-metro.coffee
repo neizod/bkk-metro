@@ -44,5 +44,13 @@ $(document).ready ->
         datasets: [ { title: "dummy", type: "basic" } ]
     load_all(tm)
     tm.getNativeMap().setOptions
+        panControl: true
+        panControlOptions:
+            position: google.maps.ControlPosition.RIGHT_BOTTOM
         zoomControl: true
+        zoomControlOptions:
+            position: google.maps.ControlPosition.LEFT_BOTTOM
+        overviewMapControl: false
+        mapTypeControl: false
         scaleControl: true
+        scrollwheel: true
