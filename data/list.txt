@@ -3,4 +3,6 @@ bts-darkgreen
 bts-limegreen
 mrt-blue
 mrt-orange
+mrt-pink
 mrt-purple
+mrt-yellow
