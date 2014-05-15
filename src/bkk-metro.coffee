@@ -30,7 +30,9 @@ load_set = (name, tm) ->
             theme: new TimeMapTheme
                 lineColor: color
                 lineWeight: 3
-                icon: 'img/tiny-pointer.png'
+                icon: 'img/tiny-donut.png'
+                iconAnchor: [4, 4]
+                iconSize: [8, 8]
             type: 'basic'
         ds.loadItems(contents.split('\n').filter(data_line), read_with_memo())
         tm.refreshTimeline()
@@ -42,8 +44,11 @@ $(document).ready ->
         timelineId: 'tl'
         bandIntervals: 'yr'
         datasets: [ { title: "dummy", type: "basic" } ]
+    tm.addFilter 'map', (item) ->
+        item.opts.type != 'marker' or map.getZoom() > 10
     load_all(tm)
-    tm.getNativeMap().setOptions
+    map = tm.getNativeMap()
+    map.setOptions
         panControl: true
         panControlOptions:
             position: google.maps.ControlPosition.RIGHT_BOTTOM
@@ -54,3 +59,5 @@ $(document).ready ->
         mapTypeControl: false
         scaleControl: true
         scrollwheel: true
+    google.maps.event.addListener map, 'zoom_changed', ->
+        tm.filter('map')
