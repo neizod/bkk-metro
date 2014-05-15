@@ -16,33 +16,22 @@ read_with_memo = (memo={}) -> (text) ->
         {id, title, start, end, point}
 
 
-load_all = (tm) ->
-    $.get 'data/list.txt', (data) ->
-        load_set(name, tm) for name in data.trim().split('\n')
-
-
-load_set = (name, tm) ->
+load_dataset = (name, ds) ->
     $.get "data/#{name}.txt", (data) ->
         [header, contents] = data.trim().split('===\n')
         [title, color] = header.trim().split('\n')
-        ds = tm.createDataset name,
-            title: title
-            theme: new TimeMapTheme
-                lineColor: color
-                lineWeight: 3
-                icon: 'img/tiny-donut.png'
-                iconAnchor: [4, 4]
-                iconSize: [8, 8]
-            type: 'basic'
+        ds.opts.title = title
+        ds.changeTheme new TimeMapTheme
+            lineColor: color
+            lineWeight: 3
+            icon: 'img/tiny-donut.png'
+            iconAnchor: [4, 4]
+            iconSize: [8, 8]
         ds.loadItems(contents.split('\n').filter(data_line), read_with_memo())
-        tm.refreshTimeline()
+        ds.timemap.refreshTimeline()
 
 
-$(document).ready ->
-    tm = TimeMap.init
-        mapId: 'map'
-        timelineId: 'tl'
-        datasets: [ { title: "dummy", type: "basic" } ]
+decorate_tl = (tm) ->
     tm.initTimeline [
         Timeline.createBandInfo
             width: "58%"
@@ -54,9 +43,9 @@ $(document).ready ->
             intervalPixels: 75
             intervalUnit: Timeline.DateTime.YEAR
     ]
-    tm.addFilter 'map', (item) ->
-        item.opts.type != 'marker' or item.map.getZoom() > 10
-    load_all(tm)
+
+
+decorate_map = (tm) ->
     map = tm.getNativeMap()
     map.setOptions
         panControl: true
@@ -69,5 +58,24 @@ $(document).ready ->
         mapTypeControl: false
         scaleControl: true
         scrollwheel: true
+
+
+listen_to_events = (tm) ->
+    map = tm.getNativeMap()
+    tm.addFilter 'map', (item) ->
+        item.opts.type != 'marker' or item.map.getZoom() > 10
     google.maps.event.addListener map, 'zoom_changed', ->
         tm.filter('map')
+
+
+$(document).ready ->
+    $.get 'data/list.txt', (data) ->
+        train_lines = data.trim().split('\n')
+        tm = TimeMap.init
+            mapId: 'map'
+            timelineId: 'tl'
+            datasets: ({ id: name, type: "basic" } for name in train_lines)
+        load_dataset(name, ds) for name, ds of tm.datasets
+        decorate_tl(tm)
+        decorate_map(tm)
+        listen_to_events(tm)
