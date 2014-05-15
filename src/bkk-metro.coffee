@@ -42,10 +42,20 @@ $(document).ready ->
     tm = TimeMap.init
         mapId: 'map'
         timelineId: 'tl'
-        bandIntervals: 'yr'
         datasets: [ { title: "dummy", type: "basic" } ]
+    tm.initTimeline [
+        Timeline.createBandInfo
+            width: "58%"
+            intervalPixels: 50
+            intervalUnit: Timeline.DateTime.MONTH
+        Timeline.createBandInfo
+            overview: true
+            width: "42%"
+            intervalPixels: 75
+            intervalUnit: Timeline.DateTime.YEAR
+    ]
     tm.addFilter 'map', (item) ->
-        item.opts.type != 'marker' or map.getZoom() > 10
+        item.opts.type != 'marker' or item.map.getZoom() > 10
     load_all(tm)
     map = tm.getNativeMap()
     map.setOptions
