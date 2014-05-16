@@ -2,18 +2,25 @@ data_line = (x) -> x.trim() != ''
 get_coord = (ll, memo) -> if ll of memo then memo[ll] else ll.split(',')
 
 
-read_with_memo = (memo={}) -> (text) ->
+read_memo = (color, memo={}) -> (text) ->
     [id, title, dt, llspecs] = text.split('\t')
     id = null if id == '-'
     [start, end] = dt.split(',')
     end = '2100' unless end?
     lls = (get_coord(ll, memo) for ll in llspecs.split(' '))
     polyline = [point, others...] = ({lat, lon} for [lat, lon] in lls)
+    options =
+        theme: TimeMapTheme
+            lineColor: color
+            lineWeight: 3
+            icon: 'img/tiny-donut.png'
+            iconAnchor: [4, 4]
+            iconSize: [8, 8]
     if others.length
-        {id, title, start, end, polyline}
+        {id, title, start, end, options, polyline}
     else
         memo[id] = [lat, lon] if id?
-        {id, title, start, end, point}
+        {id, title, start, end, options, point}
 
 
 load_dataset = (name, ds) ->
@@ -21,14 +28,7 @@ load_dataset = (name, ds) ->
         [header, contents] = data.trim().split('===\n')
         [title, color] = header.trim().split('\n')
         ds.opts.title = title
-        ds.changeTheme new TimeMapTheme
-            lineColor: color
-            lineWeight: 3
-            icon: 'img/tiny-donut.png'
-            iconAnchor: [4, 4]
-            iconSize: [8, 8]
-        ds.loadItems(contents.split('\n').filter(data_line), read_with_memo())
-        ds.timemap.refreshTimeline()
+        ds.loadItems(contents.split('\n').filter(data_line), read_memo(color))
 
 
 decorate_tl = (tm) ->
