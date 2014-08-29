@@ -1,3 +1,6 @@
+---
+---
+
 data_line = (x) -> x.trim() != ''
 get_coord = (ll, memo) -> if ll of memo then memo[ll] else ll.split(',')
 

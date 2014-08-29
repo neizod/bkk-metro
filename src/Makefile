@@ -1,3 +1,7 @@
+SHELL = /bin/bash
+
 main:
-	coffee -c bkk-metro.coffee
-	mv bkk-metro.js ..
+	coffee -cs < <(tail -n +4 bkk-metro.coffee) > bkk-metro.js
+
+clean:
+	rm -f bkk-metro.js
